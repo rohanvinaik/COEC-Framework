@@ -1,97 +1,152 @@
 # COEC Framework
 
-Implementation of Constraint-Oriented Emergent Computation (COEC) - a substrate-independent framework for understanding computation as the trajectory of physical or biological systems through constrained state spaces.
+Constraint-Oriented Emergent Computation (COEC) - A Formal Framework Bridging Biology and Computation
 
 ## Overview
 
-COEC reconceptualizes computation not as discrete logic or symbolic manipulation, but as systems undergoing entropy-driven transitions within boundary conditions. This framework provides a unified mathematical language for understanding computational processes across diverse biological contexts—from protein folding to neural dynamics.
+COEC is a substrate-independent framework describing computation as the trajectory of physical or biological systems through constrained state spaces. In COEC, computation emerges not through discrete logic or symbolic manipulation, but through systems undergoing entropy-driven transitions within boundary conditions.
 
 ## Key Concepts
 
-- **Computation as Constraint Satisfaction**: Systems compute by navigating constrained state spaces
-- **Distributed Agency**: No central controller; behavior emerges from interacting constraints
-- **Substrate Independence**: Applies equally to molecular, cellular, tissue, and ecosystem processes
-- **Information-Theoretic Foundation**: Integrates thermodynamic and informational principles
+### 7-Tuple Ontology (§2.1)
+
+The formal COEC system is defined as:
+
+**COEC** = (Ω_S, C, E, Φ, Ω_{S|C}, R, T)
+
+Where:
+- **Ω_S**: Substrate space (configuration space of states)
+- **C**: Set of constraints {c₁, c₂, ..., cₙ}
+- **E**: Energy landscape
+- **Φ**: Evolution operator
+- **Ω_{S|C}**: Constrained state space
+- **R**: Residual function (computational output)
+- **T**: Timescale specification
+
+### COEC Classes
+
+1. **SS-COEC** (Static-Structural): Systems producing stable structural outputs
+2. **DB-COEC** (Dynamic-Behavioral): Systems producing stable temporal patterns
+3. **DM-COEC** (Distributed-Multiplicative): Computation from multiple interacting subsystems
+4. **AP-COEC** (Adaptive-Plastic): Systems that modify their own constraints
+5. **PP-COEC** (Predictive-Probabilistic): Systems using internal models
+6. **GCT-COEC** (Graph-Constrained Topology): Systems using graph metrics
+7. **TDA-COEC** (Topological Data Analysis): Systems using topological features
+8. **Cat-COEC** (Catalytic): Systems using transient external memory
 
 ## Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/rohanvinaik/COEC-Framework.git
 cd COEC-Framework
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install package in development mode
 pip install -e .
 ```
 
 ## Quick Start
 
 ```python
-from coec import Substrate, Constraint, COECSystem
-from coec.constraints import EnergeticConstraint, TopologicalConstraint
-from coec.evolution import GradientDescentEvolver
+from coec import EuclideanSubstrate, LinearConstraint, QuadraticEnergy
+from coec.evolvers import GradientDescentEvolver
+from coec.simulation import run_simulation
 
-# Create a simple protein folding simulation
-substrate = Substrate(dimensions=3, size=50)  # 50 amino acid chain
+# Create substrate
+substrate = EuclideanSubstrate(state=np.random.randn(4))
+
+# Define energy landscape
+energy = QuadraticEnergy(Q=np.eye(4))
 
 # Define constraints
-energy_constraint = EnergeticConstraint(
-    potential="lennard_jones",
-    precision=0.8
-)
+constraints = [
+    LinearConstraint(w=np.array([1, 0, 0, 0]), b=0.5, precision=2.0),
+    LinearConstraint(w=np.array([0, 1, 0, 0]), b=-0.2, precision=1.0),
+]
 
-topology_constraint = TopologicalConstraint(
-    connectivity="chain",
-    precision=1.0
-)
-
-# Create and run system
-system = COECSystem(
+# Run simulation
+final_state = run_simulation(
     substrate=substrate,
-    constraints=[energy_constraint, topology_constraint],
-    evolver=GradientDescentEvolver(learning_rate=0.01)
+    constraints=constraints,
+    energy=energy,
+    evolver_cls=GradientDescentEvolver,
+    n_steps=1000
 )
-
-result = system.evolve(steps=1000)
-print(f"Final energy: {result.final_energy}")
 ```
 
-## COEC Classes
+## Project Structure
 
-The framework implements several classes of COEC systems:
-
-- **SS-COEC** (Static-Structural): Systems that compute by reaching stable structures
-- **DB-COEC** (Dynamic-Behavioral): Systems that produce stable temporal patterns
-- **DM-COEC** (Distributed-Multiplicative): Computation emerges from multiple interacting subsystems
-- **AP-COEC** (Adaptive-Plastic): Systems that modify their own constraints over time
-- **PP-COEC** (Predictive-Probabilistic): Systems using internal models to anticipate future states
+```
+coec-framework/
+├── coec/                      # Core package
+│   ├── __init__.py
+│   ├── core/                  # Core abstractions
+│   │   ├── substrate.py       # Substrate base class
+│   │   ├── constraint.py      # Constraint base class
+│   │   ├── energy.py          # Energy landscape base
+│   │   └── evolution.py       # Evolution operator base
+│   ├── substrates/            # Substrate implementations
+│   │   ├── euclidean.py       # Euclidean space
+│   │   ├── graph.py           # Graph-based substrates
+│   │   └── quantum.py         # Quantum substrates
+│   ├── constraints/           # Constraint types
+│   │   ├── linear.py          # Linear constraints
+│   │   ├── topological.py     # Topological constraints
+│   │   └── adaptive.py        # Adaptive constraints
+│   ├── energy/                # Energy landscapes
+│   │   ├── quadratic.py       # Quadratic energy
+│   │   ├── entropy.py         # Information-theoretic
+│   │   └── composite.py       # Composite landscapes
+│   ├── evolvers/              # Evolution operators
+│   │   ├── gradient.py        # Gradient descent
+│   │   ├── metropolis.py      # Metropolis-Hastings
+│   │   └── quantum.py         # Quantum evolution
+│   ├── residuals/             # Residual functions
+│   │   ├── structural.py      # Structural outputs
+│   │   └── behavioral.py      # Behavioral patterns
+│   └── utils/                 # Utilities
+│       ├── visualization.py   # Plotting tools
+│       └── metrics.py         # Analysis metrics
+├── examples/                  # Example implementations
+│   ├── protein_folding.py     # SS-COEC example
+│   ├── circadian_rhythm.py    # DB-COEC example
+│   ├── swarm_behavior.py      # DM-COEC example
+│   └── neural_plasticity.py   # AP-COEC example
+├── tests/                     # Test suite
+├── docs/                      # Documentation
+├── requirements.txt
+├── setup.py
+└── README.md
+```
 
 ## Documentation
 
-See the [docs](docs/) folder for detailed documentation and theoretical background.
-
-## Examples
-
-Check out the [examples](examples/) directory for:
-- Protein folding simulations
-- Neural dynamics modeling
-- Swarm behavior demonstrations
-- Step-by-step tutorials
+- [Mathematical Foundations](docs/mathematical_foundations.md)
+- [API Reference](docs/api_reference.md)
+- [Implementation Guide](docs/implementation_guide.md)
+- [Case Studies](docs/case_studies.md)
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## Citation
-
-If you use this framework in your research, please cite:
-
-```
-@software{coec_framework,
-  title = {COEC Framework: Constraint-Oriented Emergent Computation},
-  author = {Vinaik, Rohan},
-  year = {2024},
-  url = {https://github.com/rohanvinaik/COEC-Framework}
-}
-```
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+
+## References
+
+- Constraint-Oriented Emergent Computation: A Formal Framework Bridging Biology and Computation
+- [Project Knowledge Base](docs/references/)
+
+## Contact
+
+- Repository: https://github.com/rohanvinaik/COEC-Framework
+- Issues: https://github.com/rohanvinaik/COEC-Framework/issues
